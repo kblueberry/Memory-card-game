@@ -8,8 +8,9 @@ class MatchGrid {
     }
 }
 
+let board = new MatchGrid(600, 400, 6, 4, 10);
+
 window.onload = () => {
-    let board = new MatchGrid(600, 400, 6, 4, 300);
     const boardElement = document.getElementById('main-board');
     boardElement.style.height = `${board.boardHeight}px`;
     boardElement.style.width = `${board.boardWidth}px`;
@@ -27,4 +28,26 @@ function createCard(width, height) {
     return card;
 }
 
-function gameStart() {}
+function startTimer(duration, display) {
+    let timer = duration,
+        minutes, seconds;
+    setInterval(function () {
+        minutes = parseInt(timer / 60, 10)
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+}
+
+function startGame() {
+    let duration = board.timeLimit * 60,
+        timerDisplay = document.querySelector('.timer');
+    startTimer(duration, timerDisplay);
+}
