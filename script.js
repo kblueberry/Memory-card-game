@@ -101,8 +101,12 @@ function startGame() {
  */
 function openCard(id) {
     let openedCard = allCards.find(card => card.id === id);
-    openedCard.opened = true;
-    openedCard.domElement.classList.add('card-element__top');
+    openedCard.opened = !openedCard.opened;
+    if (openedCard.opened) {
+        openedCard.domElement.classList.add('card-element__top');
+    } else {
+        openedCard.domElement.classList.remove('card-element__top');
+    }
 }
 
 /**
