@@ -54,12 +54,15 @@ window.onload = () => {
  * @returns {HTMLDivElement}
  */
 function createCard(width, height, id, cardTextNode) {
-    const card = document.createElement('div');
-    card.appendChild(document.createTextNode(cardTextNode));
+    const card = document.createElement('div'),
+        textNodeElem = document.createElement('p');
     card.className = 'card-element__back';
     card.id = id;
     card.style.width = `${width}px`;
     card.style.height = `${height}px`;
+    textNodeElem.classList.add('card-value');
+    textNodeElem.appendChild(document.createTextNode(cardTextNode));
+    card.appendChild(textNodeElem);
     return card;
 }
 
@@ -104,8 +107,10 @@ function openCard(id) {
     openedCard.opened = !openedCard.opened;
     if (openedCard.opened) {
         openedCard.domElement.classList.add('card-element__top');
+        openedCard.domElement.classList.remove('card-element__back');
     } else {
         openedCard.domElement.classList.remove('card-element__top');
+        openedCard.domElement.classList.add('card-element__back');
     }
 }
 

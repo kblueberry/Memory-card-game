@@ -43,3 +43,11 @@
     justify-content: center;
     align-items: center;
 }
+
+.card-element__back .card-value {
+    display: none;
+}
+
+.card-element__top .card-value {
+    display: block;
+}
