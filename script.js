@@ -8,29 +8,54 @@ class MatchGrid {
     }
 }
 
+class Card {
+    constructor(element, id, cardVal) {
+        this.domElement = element;
+        this.id = id;
+        this.cardValue = cardVal;
+        this.opened = false;
+        this.matchFound = false;
+    }
+}
+
 const board = new MatchGrid(600, 400, 6, 4, 10);
-const singleSymbolsNotMatchedArr = [];
-let index = 1;
-while (index <= (board.rows * board.colums) / 2) {
-    const textNode = document.createTextNode(generateRandomString(2));
-    singleSymbolsNotMatchedArr.push(textNode);
+const singleCardUnits = [],
+    allCards = [];
+let index = 1,
+    cardsCount = board.rows * board.colums,
+    pairsCount = cardsCount / 2;
+while (index <= pairsCount) {
+    const textNode = generateRandomString(2);
+    singleCardUnits.push(textNode);
     index++;
 }
 
+/**
+ * On window load generate cards
+ */
 window.onload = () => {
     const boardElement = document.getElementById('main-board');
     boardElement.style.height = `${board.boardHeight}px`;
     boardElement.style.width = `${board.boardWidth}px`;
-    for (let count = 1; count <= (board.rows * board.colums); count++) {
-        let card = createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count);
-        card.addEventListener('click', () => openCard(count));
-        boardElement.append(card);
+    for (let count = 1; count <= cardsCount; count++) {
+        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count- cardsCount)];
+        let card = new Card(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count, cardTextNode), count, cardTextNode);
+        card.domElement.addEventListener('click', () => openCard(count));
+        boardElement.append(card.domElement);
+        allCards.push(card);
     }
-    console.log('div child modes', boardElement);
 }
 
-function createCard(width, height, id) {
+/**
+ * Create a DOM element for card with certain attributes
+ * @param width
+ * @param height
+ * @param id
+ * @returns {HTMLDivElement}
+ */
+function createCard(width, height, id, cardTextNode) {
     const card = document.createElement('div');
+    card.appendChild(document.createTextNode(cardTextNode));
     card.className = 'card-element__back';
     card.id = id;
     card.style.width = `${width}px`;
@@ -38,6 +63,11 @@ function createCard(width, height, id) {
     return card;
 }
 
+/**
+ * Count time spent for quiz
+ * @param duration
+ * @param display
+ */
 function startTimer(duration, display) {
     let timer = duration,
         minutes, seconds;
@@ -56,18 +86,30 @@ function startTimer(duration, display) {
     }, 1000);
 }
 
+/**
+ * On button click start game and countdown time
+ */
 function startGame() {
     let duration = board.timeLimit * 60,
         timerDisplay = document.querySelector('.timer');
     startTimer(duration, timerDisplay);
 }
 
+/**
+ * Open card and search for another card to match
+ * @param id
+ */
 function openCard(id) {
-    let openedCard = document.getElementById(id);
-    openedCard.appendChild((id <= (board.rows * board.colums) / 2) ? singleSymbolsNotMatchedArr[id] : singleSymbolsNotMatchedArr[Math.abs(id - (board.rows * board.colums))]);
-    openedCard.classList.add('card-element__top');
+    let openedCard = allCards.find(card => card.id === id);
+    openedCard.opened = true;
+    openedCard.domElement.classList.add('card-element__top');
 }
 
+/**
+ * Generate random string value for a card
+ * @param length
+ * @returns {string}
+ */
 function generateRandomString(length) {
     let result = '';
     const characters = 'ABCDE';
