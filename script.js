@@ -8,21 +8,31 @@ class MatchGrid {
     }
 }
 
-let board = new MatchGrid(600, 400, 6, 4, 10);
+const board = new MatchGrid(600, 400, 6, 4, 10);
+const singleSymbolsNotMatchedArr = [];
+let index = 1;
+while (index <= (board.rows * board.colums) / 2) {
+    const textNode = document.createTextNode(generateRandomString(2));
+    singleSymbolsNotMatchedArr.push(textNode);
+    index++;
+}
 
 window.onload = () => {
     const boardElement = document.getElementById('main-board');
     boardElement.style.height = `${board.boardHeight}px`;
     boardElement.style.width = `${board.boardWidth}px`;
     for (let count = 1; count <= (board.rows * board.colums); count++) {
-        boardElement.append(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows));
+        let card = createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count);
+        card.addEventListener('click', () => openCard(count));
+        boardElement.append(card);
     }
     console.log('div child modes', boardElement);
 }
 
-function createCard(width, height) {
+function createCard(width, height, id) {
     const card = document.createElement('div');
-    card.className = 'card-element';
+    card.className = 'card-element__back';
+    card.id = id;
     card.style.width = `${width}px`;
     card.style.height = `${height}px`;
     return card;
@@ -51,3 +61,22 @@ function startGame() {
         timerDisplay = document.querySelector('.timer');
     startTimer(duration, timerDisplay);
 }
+
+function openCard(id) {
+    let openedCard = document.getElementById(id);
+    openedCard.appendChild((id <= (board.rows * board.colums) / 2) ? singleSymbolsNotMatchedArr[id] : singleSymbolsNotMatchedArr[Math.abs(id - (board.rows * board.colums))]);
+    openedCard.classList.add('card-element__top');
+}
+
+function generateRandomString(length) {
+    let result = '';
+    const characters = 'ABCDE';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        counter += 1;
+    }
+    return result;
+}
+
