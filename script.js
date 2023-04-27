@@ -19,8 +19,8 @@ class Card {
 }
 
 const board = new MatchGrid(600, 400, 6, 4, 10);
-const singleCardUnits = [],
-    allCards = [];
+const singleCardUnits = [];
+let allCards = [];
 let index = 1,
     cardsCount = board.rows * board.colums,
     pairsCount = cardsCount / 2;
@@ -38,7 +38,7 @@ window.onload = () => {
     boardElement.style.height = `${board.boardHeight}px`;
     boardElement.style.width = `${board.boardWidth}px`;
     for (let count = 1; count <= cardsCount; count++) {
-        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count- cardsCount)];
+        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - cardsCount)];
         let card = new Card(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count, cardTextNode), count, cardTextNode);
         card.domElement.addEventListener('click', () => openCard(count));
         boardElement.append(card.domElement);
@@ -105,12 +105,36 @@ function startGame() {
 function openCard(id) {
     let openedCard = allCards.find(card => card.id === id);
     openedCard.opened = !openedCard.opened;
+    const cardsOpened = allCards.filter(card => card.opened);
+
+    if (cardsOpened.length > 2) return;
     if (openedCard.opened) {
-        openedCard.domElement.classList.add('card-element__top');
-        openedCard.domElement.classList.remove('card-element__back');
+        editStylesDynamically(openedCard.domElement, 'card-element__top', 'card-element__back');
     } else {
-        openedCard.domElement.classList.remove('card-element__top');
-        openedCard.domElement.classList.add('card-element__back');
+        editStylesDynamically(openedCard.domElement, 'card-element__back', 'card-element__top');
+    }
+    checkIfOpenedCardsMatch(cardsOpened[0], cardsOpened[1]);
+}
+
+/**
+ * Check opened card if matching
+ * @param card1
+ * @param card2
+ */
+function checkIfOpenedCardsMatch(card1, card2) {
+    if (card1.cardValue !== card2.cardValue) {
+        card1.opened = false;
+        card2.opened = false;
+        setTimeout(() => {
+            editStylesDynamically(card1.domElement, 'card-element__back', 'card-element__top');
+            editStylesDynamically(card2.domElement, 'card-element__back', 'card-element__top');
+        }, 500);
+    } else {
+        allCards = allCards.filter(card => card.id !== card1.id && card.id !== card2.id);
+        setTimeout(() => {
+            document.getElementById(card1.id).style.visibility = 'hidden';
+            document.getElementById(card2.id).style.visibility = 'hidden';
+        }, 500);
     }
 }
 
@@ -121,7 +145,7 @@ function openCard(id) {
  */
 function generateRandomString(length) {
     let result = '';
-    const characters = 'ABCDE';
+    const characters = 'みに習かす';
     const charactersLength = characters.length;
     let counter = 0;
     while (counter < length) {
@@ -129,5 +153,16 @@ function generateRandomString(length) {
         counter += 1;
     }
     return result;
+}
+
+/**
+ * Remove/add css classes depending on card opened state
+ * @param element
+ * @param class1
+ * @param class2
+ */
+function editStylesDynamically(element, class1, class2) {
+    element.classList.add(class1);
+    element.classList.remove(class2);
 }
 
