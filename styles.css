@@ -18,6 +18,13 @@
 .timer {
     padding-top: 10px;
     font-size: 24px;
+    padding-bottom: 12px;
+}
+
+#cards-match-shower {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 5px 0;
 }
 
 #main-board {

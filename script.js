@@ -18,9 +18,10 @@ class Card {
     }
 }
 
-const board = new MatchGrid(600, 400, 6, 4, 10);
+const board = new MatchGrid(600, 400, 6, 4, 2);
 const singleCardUnits = [];
 let allCards = [];
+let gameStarted = false;
 let index = 1,
     cardsCount = board.rows * board.colums,
     pairsCount = cardsCount / 2;
@@ -29,6 +30,7 @@ while (index <= pairsCount) {
     singleCardUnits.push(textNode);
     index++;
 }
+let timeCounterId;
 
 /**
  * On window load generate cards
@@ -74,7 +76,7 @@ function createCard(width, height, id, cardTextNode) {
 function startTimer(duration, display) {
     let timer = duration,
         minutes, seconds;
-    setInterval(function () {
+    timeCounterId = setInterval(function () {
         minutes = parseInt(timer / 60, 10)
         seconds = parseInt(timer % 60, 10);
 
@@ -86,6 +88,9 @@ function startTimer(duration, display) {
         if (--timer < 0) {
             timer = duration;
         }
+        if (timer === 0) {
+            alert(!!allCards.length ? 'You lost!' : 'You won!');
+        }
     }, 1000);
 }
 
@@ -96,6 +101,16 @@ function startGame() {
     let duration = board.timeLimit * 60,
         timerDisplay = document.querySelector('.timer');
     startTimer(duration, timerDisplay);
+    gameStarted = true;
+}
+
+/**
+ * Stop game on mouse left outside the board
+ * @param event
+ */
+function stopGame(event) {
+    console.log('mouse out!', event);
+    clearInterval(timeCounterId);
 }
 
 /**
@@ -103,6 +118,9 @@ function startGame() {
  * @param id
  */
 function openCard(id) {
+    if (!gameStarted) {
+        return;
+    }
     let openedCard = allCards.find(card => card.id === id);
     openedCard.opened = !openedCard.opened;
     const cardsOpened = allCards.filter(card => card.opened);
@@ -132,6 +150,9 @@ function checkIfOpenedCardsMatch(card1, card2) {
     } else {
         allCards = allCards.filter(card => card.id !== card1.id && card.id !== card2.id);
         setTimeout(() => {
+            const textContent = `Cards width ids ${card1.id} and ${card2.id} matched`,
+                textNode = document.createTextNode(textContent);
+            document.getElementById('cards-match-shower').appendChild(textNode);
             document.getElementById(card1.id).style.visibility = 'hidden';
             document.getElementById(card2.id).style.visibility = 'hidden';
         }, 500);
