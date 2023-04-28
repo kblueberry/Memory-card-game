@@ -88,11 +88,12 @@ function startTimer(duration, displayElement) {
         displayElement.textContent = minutes + ":" + seconds;
         timeLeft = timer;
 
-        if (--timer < 0) {
+        if (--timer === 0) {
             alert(!!allCards.length ? 'You lost!' : 'You won!');
             return;
         }
-        if (--timer > 0 && !allCards.length) {
+        if (!allCards.length) {
+            clearInterval(timeCounterId);
             alert('You won!');
         }
     }, 1000);
