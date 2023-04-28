@@ -18,7 +18,7 @@ class Card {
 }
 
 const boardDomElement = document.getElementById('main-board');
-const board = new MatchGrid(600, 400, 6, 4, 1);
+const board = new MatchGrid(1200, 800, 6, 4, 3);
 const singleCardUnits = [];
 let allCards = [], initialCardsCollection = [];
 let gameStarted = false;
@@ -40,7 +40,14 @@ let timerDisplay = document.querySelector('.timer'),
 window.onload = () => {
     boardDomElement.style.height = `${board.boardHeight}px`;
     boardDomElement.style.width = `${board.boardWidth}px`;
-    fillCardsCollection();
+    for (let count = 1; count <= cardsCount; count++) {
+        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - cardsCount)];
+        let card = new Card(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count, cardTextNode), count, cardTextNode);
+        card.domElement.addEventListener('click', () => openCard(count));
+        boardDomElement.append(card.domElement);
+        allCards.push(card);
+        initialCardsCollection.push({...card});
+    }
 }
 
 /**
@@ -194,16 +201,5 @@ function generateRandomString(length) {
 function editStylesDynamically(element, class1, class2) {
     element.classList.add(class1);
     element.classList.remove(class2);
-}
-
-function fillCardsCollection() {
-    for (let count = 1; count <= cardsCount; count++) {
-        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - cardsCount)];
-        let card = new Card(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count, cardTextNode), count, cardTextNode);
-        card.domElement.addEventListener('click', () => openCard(count));
-        boardDomElement.append(card.domElement);
-        allCards.push(card);
-        initialCardsCollection.push({...card});
-    }
 }
 
