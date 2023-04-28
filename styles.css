@@ -1,0 +1,67 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-time-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.action {
+    width: 65px;
+    background: white;
+    color: black;
+    font-size: 16px;
+    outline: none;
+    border-radius: 4px;
+    margin: 0 4px;
+}
+
+.timer {
+    padding-top: 10px;
+    font-size: 24px;
+    padding-bottom: 12px;
+}
+
+#cards-match-shower {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 5px 0;
+}
+
+#main-board {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0 auto;
+}
+
+.card-element__back, .card-element__top {
+    display: inline-block;
+    border: 3px solid white;
+    box-sizing: border-box;
+}
+
+.card-element__back {
+    background: forestgreen;
+}
+
+.card-element__top {
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-element__back .card-value {
+    display: none;
+}
+
+.card-element__top .card-value {
+    display: block;
+}
