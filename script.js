@@ -31,6 +31,8 @@ while (index <= pairsCount) {
     index++;
 }
 let timeCounterId;
+let timerDisplay = document.querySelector('.timer'),
+    timeLeft = board.timeLimit * 60;
 
 /**
  * On window load generate cards
@@ -71,9 +73,9 @@ function createCard(width, height, id, cardTextNode) {
 /**
  * Count time spent for quiz
  * @param duration
- * @param display
+ * @param displayElement
  */
-function startTimer(duration, display) {
+function startTimer(duration, displayElement) {
     let timer = duration,
         minutes, seconds;
     timeCounterId = setInterval(function () {
@@ -83,13 +85,15 @@ function startTimer(duration, display) {
         minutes = minutes < 10 ? "0" + minutes : minutes;
         seconds = seconds < 10 ? "0" + seconds : seconds;
 
-        display.textContent = minutes + ":" + seconds;
+        displayElement.textContent = minutes + ":" + seconds;
+        timeLeft = timer;
 
         if (--timer < 0) {
-            timer = duration;
-        }
-        if (timer === 0) {
             alert(!!allCards.length ? 'You lost!' : 'You won!');
+            return;
+        }
+        if (--timer > 0 && !allCards.length) {
+            alert('You won!');
         }
     }, 1000);
 }
@@ -98,8 +102,7 @@ function startTimer(duration, display) {
  * On button click start game and countdown time
  */
 function startGame() {
-    let duration = board.timeLimit * 60,
-        timerDisplay = document.querySelector('.timer');
+    let duration = board.timeLimit * 60;
     startTimer(duration, timerDisplay);
     gameStarted = true;
 }
@@ -108,8 +111,7 @@ function startGame() {
  * Stop game on mouse left outside the board
  * @param event
  */
-function stopGame(event) {
-    console.log('mouse out!', event);
+function stopGame() {
     clearInterval(timeCounterId);
 }
 
