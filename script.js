@@ -14,7 +14,6 @@ class Card {
         this.id = id;
         this.cardValue = cardVal;
         this.opened = false;
-        this.matchFound = false;
     }
 }
 
@@ -148,21 +147,23 @@ function openCard(id) {
  * @param card2
  */
 function checkIfOpenedCardsMatch(card1, card2) {
+    let textContent, matchesShower = document.getElementById('cards-match-shower');
     if (card1.cardValue !== card2.cardValue) {
         card1.opened = false;
         card2.opened = false;
         setTimeout(() => {
             editStylesDynamically(card1.domElement, 'card-element__back', 'card-element__top');
             editStylesDynamically(card2.domElement, 'card-element__back', 'card-element__top');
+            textContent = '';
+            matchesShower.textContent = textContent;
         }, 500);
     } else {
         allCards = allCards.filter(card => card.id !== card1.id && card.id !== card2.id);
         setTimeout(() => {
-            const textContent = `Cards width ids ${card1.id} and ${card2.id} matched`,
-                textNode = document.createTextNode(textContent);
-            document.getElementById('cards-match-shower').appendChild(textNode);
             document.getElementById(card1.id).style.visibility = 'hidden';
             document.getElementById(card2.id).style.visibility = 'hidden';
+            textContent = `Cards width ids ${card1.id} and ${card2.id} matched`;
+            matchesShower.textContent = textContent;
         }, 500);
     }
 }
