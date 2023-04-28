@@ -8,7 +8,10 @@
 </head>
 <body>
 <main class="main">
-  <button class="start-action" onclick="startGame()">Start</button>
+  <div class="game-time-controls">
+    <button class="action start" onclick="startGame()">Start</button>
+    <button class="action replay" onclick="replayGame()">Replay</button>
+  </div>
   <span class="timer"></span>
   <span id="cards-match-shower"></span>
   <div id="main-board" onmouseleave="stopGame()">

@@ -18,9 +18,10 @@ class Card {
     }
 }
 
-const board = new MatchGrid(600, 400, 6, 4, 2);
+const boardDomElement = document.getElementById('main-board');
+const board = new MatchGrid(600, 400, 6, 4, 1);
 const singleCardUnits = [];
-let allCards = [];
+let allCards = [], initialCardsCollection = [];
 let gameStarted = false;
 let index = 1,
     cardsCount = board.rows * board.colums,
@@ -38,16 +39,9 @@ let timerDisplay = document.querySelector('.timer'),
  * On window load generate cards
  */
 window.onload = () => {
-    const boardElement = document.getElementById('main-board');
-    boardElement.style.height = `${board.boardHeight}px`;
-    boardElement.style.width = `${board.boardWidth}px`;
-    for (let count = 1; count <= cardsCount; count++) {
-        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - cardsCount)];
-        let card = new Card(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count, cardTextNode), count, cardTextNode);
-        card.domElement.addEventListener('click', () => openCard(count));
-        boardElement.append(card.domElement);
-        allCards.push(card);
-    }
+    boardDomElement.style.height = `${board.boardHeight}px`;
+    boardDomElement.style.width = `${board.boardWidth}px`;
+    fillCardsCollection();
 }
 
 /**
@@ -64,6 +58,7 @@ function createCard(width, height, id, cardTextNode) {
     card.id = id;
     card.style.width = `${width}px`;
     card.style.height = `${height}px`;
+    card.style.visibility = 'visible';
     textNodeElem.classList.add('card-value');
     textNodeElem.appendChild(document.createTextNode(cardTextNode));
     card.appendChild(textNodeElem);
@@ -106,6 +101,16 @@ function startGame() {
     let duration = board.timeLimit * 60;
     startTimer(duration, timerDisplay);
     gameStarted = true;
+}
+
+function replayGame() {
+    allCards = initialCardsCollection;
+    Array.from(boardDomElement.children).forEach(childNode => {
+        childNode.style.visibility = 'visible';
+        editStylesDynamically(childNode, 'card-element__back', 'card-element__top');
+    });
+    clearInterval(timeCounterId);
+    startGame();
 }
 
 /**
@@ -188,5 +193,16 @@ function generateRandomString(length) {
 function editStylesDynamically(element, class1, class2) {
     element.classList.add(class1);
     element.classList.remove(class2);
+}
+
+function fillCardsCollection() {
+    for (let count = 1; count <= cardsCount; count++) {
+        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - cardsCount)];
+        let card = new Card(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count, cardTextNode), count, cardTextNode);
+        card.domElement.addEventListener('click', () => openCard(count));
+        boardDomElement.append(card.domElement);
+        allCards.push(card);
+        initialCardsCollection.push({...card});
+    }
 }
 
