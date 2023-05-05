@@ -172,6 +172,20 @@ function checkIfOpenedCardsMatch(card1, card2) {
             textContent = `Cards width ids ${card1.id} and ${card2.id} matched`;
             matchesShower.textContent = textContent;
         }, 500);
+
+        let matchTextTimeline = anime.timeline({
+            targets: matchesShower,
+            duration: 500,
+            easing: 'easeInOutSine',
+            direction: 'alternate'
+        });
+        matchTextTimeline
+            .add({
+                translateX: '25%',
+            })
+            .add({
+                translateX: '-300%'
+            });
     }
 }
 
