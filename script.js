@@ -48,6 +48,14 @@ window.onload = () => {
         allCards.push(card);
         initialCardsCollection.push({...card});
     }
+    anime({
+        targets: '#main-board .card-element__back',
+        scale: [
+            {value: .1, easing: 'easeOutSine', duration: 400},
+            {value: 1, easing: 'easeInOutQuad', duration: 500}
+        ],
+        delay: anime.stagger(200, {grid: [6, 4], from: 'last'})
+    }, 400);
 }
 
 /**
@@ -181,11 +189,11 @@ function checkIfOpenedCardsMatch(card1, card2) {
         });
         matchTextTimeline
             .add({
-                translateX: '25%',
+                translateX: '-300%'
             })
             .add({
-                translateX: '-300%'
-            });
+                translateX: '25%',
+            })
     }
 }
 
