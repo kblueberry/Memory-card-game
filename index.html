@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <title>Memory card game</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+    <script src="script.js" type="module" defer></script>
 </head>
 <body>
 <main class="main">
     <div class="game-time-controls">
-        <button class="action start" onclick="startGame()">Start</button>
-        <button class="action replay" onclick="replayGame()">Replay</button>
+        <button class="action start">Start</button>
+        <button class="action replay">Replay</button>
     </div>
     <span class="timer"></span>
     <span id="cards-match-shower"></span>
     <!--  wanted to implement renew of timer via mouseenter event (mouseenter)="startTimer(timerLeft, timerDuration),
     but faced problem - with that mouseleave event stops working"-->
-    <div id="main-board" onmouseleave="stopGame()">
+    <div id="main-board">
     </div>
 </main>
 </body>

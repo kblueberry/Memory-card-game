@@ -1,74 +1,43 @@
-class MatchGrid {
-    constructor(...args) {
-        this.boardWidth = args[0];
-        this.boardHeight = args[1];
-        this.colums = args[2];
-        this.rows = args[3];
-        this.timeLimit = args[4];
-    }
-}
+import Card from './card.js';
+import Board from './board.js'
 
-class Card {
-    constructor(element, id, cardVal) {
-        this.domElement = element;
-        this.id = id;
-        this.cardValue = cardVal;
-        this.opened = false;
-    }
-}
+const BOARD_WIDTH = 1200;
+const BOARD_HEIGHT = 800;
+const COLUMNS = 6;
+const ROWS = 4;
+const TIME = 3;
 
-const boardDomElement = document.getElementById('main-board');
-const board = new MatchGrid(1200, 800, 6, 4, 3);
+const board = new Board(BOARD_WIDTH, BOARD_HEIGHT, COLUMNS, ROWS, TIME);
 const singleCardUnits = [];
 let allCards = [], initialCardsCollection = [];
 let gameStarted = false;
-let index = 1,
-    cardsCount = board.rows * board.colums,
-    pairsCount = cardsCount / 2;
-while (index <= pairsCount) {
+let index = 1;
+while (index <= board.cardPairsCount) {
     const textNode = generateRandomString(2);
     singleCardUnits.push(textNode);
     index++;
 }
 let timeCounterId;
-let timerDisplay = document.querySelector('.timer'),
-    timeLeft = board.timeLimit * 60;
+let timerDisplay = document.querySelector('.timer');
+document.querySelector('.start').onclick = () => startGame();
+document.querySelector('.replay').onclick = () => replayGame();
 
 /**
  * On window load generate cards
  */
 window.onload = () => {
-    boardDomElement.style.height = `${board.boardHeight}px`;
-    boardDomElement.style.width = `${board.boardWidth}px`;
-    for (let count = 1; count <= cardsCount; count++) {
-        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - cardsCount)];
-        let card = new Card(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count, cardTextNode), count, cardTextNode);
-        card.domElement.addEventListener('click', () => openCard(count));
-        boardDomElement.append(card.domElement);
+    board.setBoardSize();
+
+    for (let count = 1; count <= board.cardsCount; count++) {
+        let cardContent = count <= board.cardPairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - board.cardsCount)],
+            card = new Card(count, cardContent);
+        card.createDOMElement(board.boardWidth / board.colums, board.boardHeight / board.rows, count);
+        card.addCardContent(cardContent);
+        card.domElement.onclick = () => openCard(count);
+        board.boardElementRef.append(card.domElement);
         allCards.push(card);
         initialCardsCollection.push({...card});
     }
-}
-
-/**
- * Create a DOM element for card with certain attributes
- * @param width
- * @param height
- * @param id
- * @returns {HTMLDivElement}
- */
-function createCard(width, height, id, cardTextNode) {
-    const card = document.createElement('div'),
-        textNodeElem = document.createElement('p');
-    card.className = 'card-element__back';
-    card.id = id;
-    card.style.width = `${width}px`;
-    card.style.height = `${height}px`;
-    card.style.visibility = 'visible';
-    textNodeElem.classList.add('card-value');
-    textNodeElem.appendChild(document.createTextNode(cardTextNode));
-    card.appendChild(textNodeElem);
-    return card;
 }
 
 /**
@@ -79,6 +48,7 @@ function createCard(width, height, id, cardTextNode) {
 function startTimer(duration, displayElement) {
     let timer = duration,
         minutes, seconds;
+    clearInterval(timeCounterId);
     timeCounterId = setInterval(function () {
         minutes = parseInt(timer / 60, 10)
         seconds = parseInt(timer % 60, 10);
@@ -87,7 +57,6 @@ function startTimer(duration, displayElement) {
         seconds = seconds < 10 ? "0" + seconds : seconds;
 
         displayElement.textContent = minutes + ":" + seconds;
-        timeLeft = timer;
 
         if (--timer === 0) {
             alert(!!allCards.length ? 'You lost!' : 'You won!');
@@ -111,20 +80,12 @@ function startGame() {
 
 function replayGame() {
     allCards = initialCardsCollection;
-    Array.from(boardDomElement.children).forEach(childNode => {
+    Array.from(board.boardElementRef.children).forEach(childNode => {
         childNode.style.visibility = 'visible';
         editStylesDynamically(childNode, 'card-element__back', 'card-element__top');
     });
     clearInterval(timeCounterId);
     startGame();
-}
-
-/**
- * Stop game on mouse left outside the board
- * @param event
- */
-function stopGame() {
-    clearInterval(timeCounterId);
 }
 
 /**
@@ -141,9 +102,9 @@ function openCard(id) {
 
     if (cardsOpened.length > 2) return;
     if (openedCard.opened) {
-        editStylesDynamically(openedCard.domElement, 'card-element__top', 'card-element__back');
+        openedCard.editStylesDynamically('card-element__top', 'card-element__back');
     } else {
-        editStylesDynamically(openedCard.domElement, 'card-element__back', 'card-element__top');
+        openedCard.editStylesDynamically('card-element__back', 'card-element__top');
     }
     checkIfOpenedCardsMatch(cardsOpened[0], cardsOpened[1]);
 }
@@ -159,16 +120,16 @@ function checkIfOpenedCardsMatch(card1, card2) {
         card1.opened = false;
         card2.opened = false;
         setTimeout(() => {
-            editStylesDynamically(card1.domElement, 'card-element__back', 'card-element__top');
-            editStylesDynamically(card2.domElement, 'card-element__back', 'card-element__top');
+            card1.editStylesDynamically('card-element__back', 'card-element__top');
+            card2.editStylesDynamically('card-element__back', 'card-element__top');
             textContent = '';
             matchesShower.textContent = textContent;
         }, 500);
     } else {
         allCards = allCards.filter(card => card.id !== card1.id && card.id !== card2.id);
         setTimeout(() => {
-            document.getElementById(card1.id).style.visibility = 'hidden';
-            document.getElementById(card2.id).style.visibility = 'hidden';
+            card1.hideCardContent();
+            card2.hideCardContent();
             textContent = `Cards width ids ${card1.id} and ${card2.id} matched`;
             matchesShower.textContent = textContent;
         }, 500);
