@@ -195,6 +195,11 @@ function checkIfOpenedCardsMatch(card1, card2) {
                 translateX: '25%',
             })
     }
+    anime({
+        targets: [card1.domElement, card2.domElement],
+        opacity: ['.2', '.5', '.8', '1'],
+        easing: 'easeInOutExpo'
+    });
 }
 
 /**
