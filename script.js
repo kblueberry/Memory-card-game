@@ -8,7 +8,9 @@ const ROWS = 4;
 const TIME = 3;
 
 const board = new Board(BOARD_WIDTH, BOARD_HEIGHT, COLUMNS, ROWS, TIME);
+const gameMainSection = document.querySelector('.main');
 const singleCardUnits = [];
+let gameResult;
 let allCards = [], initialCardsCollection = [];
 let gameStarted = false;
 let index = 1;
@@ -46,43 +48,54 @@ window.onload = () => {
  * @param displayElement
  */
 function startTimer(duration, displayElement) {
+    gameResult = document.createElement('div');
+    gameResult.className = 'result-container';
+    document.querySelector('.main').appendChild(gameResult);
+
     let timer = duration,
         minutes, seconds;
     clearInterval(timeCounterId);
     timeCounterId = setInterval(function () {
         minutes = parseInt(timer / 60, 10)
         seconds = parseInt(timer % 60, 10);
-
         minutes = minutes < 10 ? "0" + minutes : minutes;
         seconds = seconds < 10 ? "0" + seconds : seconds;
-
         displayElement.textContent = minutes + ":" + seconds;
-
-        if (--timer === 0) {
-            alert(!!allCards.length ? 'You lost!' : 'You won!');
-            return;
+        
+        --timer;
+        if (timer < 0 && !!allCards.length) {
+            gameResult.appendChild(document.createTextNode('Oopps..! You lost, game is over!'));
         }
-        if (!allCards.length) {
+        if (timer > 0 && !allCards.length) {
+            gameResult.appendChild(document.createTextNode('Congratulations, you won!'));
+        }
+        if (!!gameResult.childNodes.length) {
+            board.boardElementRef.classList.add('board-low-opacity');
             clearInterval(timeCounterId);
-            alert('You won!');
         }
     }, 1000);
 }
 
 /**
- * On button click start game and countdown time
+ * Start game
  */
 function startGame() {
+    resetBoardVisibility();
     let duration = board.timeLimit * 60;
     startTimer(duration, timerDisplay);
     gameStarted = true;
 }
 
+/**
+ * Restart game
+ */
 function replayGame() {
+    resetBoardVisibility();
     allCards = initialCardsCollection;
     Array.from(board.boardElementRef.children).forEach(childNode => {
         childNode.style.visibility = 'visible';
-        editStylesDynamically(childNode, 'card-element__back', 'card-element__top');
+        element.classList.add(class1);
+        element.classList.remove(class2);
     });
     clearInterval(timeCounterId);
     startGame();
@@ -154,13 +167,13 @@ function generateRandomString(length) {
 }
 
 /**
- * Remove/add css classes depending on card opened state
- * @param element
- * @param class1
- * @param class2
+ * Remove game result container when game is restarted/replayed
  */
-function editStylesDynamically(element, class1, class2) {
-    element.classList.add(class1);
-    element.classList.remove(class2);
+function resetBoardVisibility() {
+    if (gameMainSection.contains(gameResult)) {
+        board.boardElementRef.classList.remove('board-low-opacity');
+        gameMainSection.removeChild(gameResult);
+    }
 }
+
 
