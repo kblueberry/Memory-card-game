@@ -82,7 +82,8 @@ function replayGame() {
     allCards = initialCardsCollection;
     Array.from(board.boardElementRef.children).forEach(childNode => {
         childNode.style.visibility = 'visible';
-        editStylesDynamically(childNode, 'card-element__back', 'card-element__top');
+        element.classList.add(class1);
+        element.classList.remove(class2);
     });
     clearInterval(timeCounterId);
     startGame();
@@ -153,14 +154,4 @@ function generateRandomString(length) {
     return result;
 }
 
-/**
- * Remove/add css classes depending on card opened state
- * @param element
- * @param class1
- * @param class2
- */
-function editStylesDynamically(element, class1, class2) {
-    element.classList.add(class1);
-    element.classList.remove(class2);
-}
 
