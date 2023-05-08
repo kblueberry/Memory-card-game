@@ -13,7 +13,9 @@
 }
 
 .action {
-    width: 65px;
+    width: 70px;
+    height: 30px;
+    line-height: 22px;
     background: white;
     color: black;
     font-size: 16px;

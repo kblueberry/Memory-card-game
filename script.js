@@ -9,6 +9,9 @@ const TIME = 3;
 
 const board = new Board(BOARD_WIDTH, BOARD_HEIGHT, COLUMNS, ROWS, TIME);
 const singleCardUnits = [];
+let timeCounterId,
+    timerDisplay = document.querySelector('.timer'),
+    replayButton = document.querySelector('.replay');
 let allCards = [], initialCardsCollection = [];
 let gameStarted = false;
 let index = 1;
@@ -17,10 +20,10 @@ while (index <= board.cardPairsCount) {
     singleCardUnits.push(textNode);
     index++;
 }
-let timeCounterId;
-let timerDisplay = document.querySelector('.timer');
+
 document.querySelector('.start').onclick = () => startGame();
-document.querySelector('.replay').onclick = () => replayGame();
+replayButton.onclick = () => replayGame();
+replayButton.style.display = 'none';
 
 /**
  * On window load generate cards
@@ -73,16 +76,18 @@ function startTimer(duration, displayElement) {
  * On button click start game and countdown time
  */
 function startGame() {
+    gameStarted = true;
     let duration = board.timeLimit * 60;
     startTimer(duration, timerDisplay);
-    gameStarted = true;
+    replayButton.style.display = 'block';
 }
 
 function replayGame() {
     allCards = initialCardsCollection;
     Array.from(board.boardElementRef.children).forEach(childNode => {
         childNode.style.visibility = 'visible';
-        editStylesDynamically(childNode, 'card-element__back', 'card-element__top');
+        childNode.classList.add('card-element__back');
+        childNode.classList.remove('card-element__top');
     });
     clearInterval(timeCounterId);
     startGame();
@@ -115,7 +120,8 @@ function openCard(id) {
  * @param card2
  */
 function checkIfOpenedCardsMatch(card1, card2) {
-    let textContent, matchesShower = document.getElementById('cards-match-shower');
+    let textContent;
+    let matchesShower = document.getElementById('cards-match-shower');
     if (card1.cardValue !== card2.cardValue) {
         card1.opened = false;
         card2.opened = false;
@@ -153,14 +159,4 @@ function generateRandomString(length) {
     return result;
 }
 
-/**
- * Remove/add css classes depending on card opened state
- * @param element
- * @param class1
- * @param class2
- */
-function editStylesDynamically(element, class1, class2) {
-    element.classList.add(class1);
-    element.classList.remove(class2);
-}
 
