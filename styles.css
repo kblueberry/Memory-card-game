@@ -41,6 +41,14 @@
     margin: 0 auto;
 }
 
+.result-container {
+    position: absolute;
+    top: 50%;
+    width: inherit;
+    height: 60px;
+    font-size: 36px;
+}
+
 .card-element__back, .card-element__top {
     display: inline-block;
     border: 3px solid white;
@@ -64,4 +72,8 @@
 
 .card-element__top .card-value {
     display: block;
+}
+
+.board-low-opacity {
+    opacity: .4;
 }
