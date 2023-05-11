@@ -1,53 +1,48 @@
-class MatchGrid {
-    constructor(...args) {
-        this.boardWidth = args[0];
-        this.boardHeight = args[1];
-        this.colums = args[2];
-        this.rows = args[3];
-        this.timeLimit = args[4];
-    }
-}
+import Card from './card.js';
+import Board from './board.js'
 
-class Card {
-    constructor(element, id, cardVal) {
-        this.domElement = element;
-        this.id = id;
-        this.cardValue = cardVal;
-        this.opened = false;
-    }
-}
+const BOARD_WIDTH = 1200;
+const BOARD_HEIGHT = 800;
+const COLUMNS = 6;
+const ROWS = 4;
+const TIME = 3;
 
-const boardDomElement = document.getElementById('main-board');
-const board = new MatchGrid(1200, 800, 6, 4, 3);
+const board = new Board(BOARD_WIDTH, BOARD_HEIGHT, COLUMNS, ROWS, TIME);
+const gameMainSection = document.querySelector('.main');
 const singleCardUnits = [];
+let gameResult;
+let timeCounterId,
+    timerDisplay = document.querySelector('.timer'),
+    replayButton = document.querySelector('.replay'),
+    startButton = document.querySelector('.start');
 let allCards = [], initialCardsCollection = [];
 let gameStarted = false;
-let index = 1,
-    cardsCount = board.rows * board.colums,
-    pairsCount = cardsCount / 2;
-while (index <= pairsCount) {
+let index = 1;
+while (index <= board.cardPairsCount) {
     const textNode = generateRandomString(2);
     singleCardUnits.push(textNode);
     index++;
 }
-let timeCounterId;
-let timerDisplay = document.querySelector('.timer'),
-    timeLeft = board.timeLimit * 60;
+
+startButton.onclick = () => startGame();
+replayButton.onclick = () => replayGame();
 
 /**
  * On window load generate cards
  */
 window.onload = () => {
-    boardDomElement.style.height = `${board.boardHeight}px`;
-    boardDomElement.style.width = `${board.boardWidth}px`;
-    for (let count = 1; count <= cardsCount; count++) {
-        let cardTextNode = count <= pairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - cardsCount)];
-        let card = new Card(createCard(board.boardWidth / board.colums, board.boardHeight / board.rows, count, cardTextNode), count, cardTextNode);
-        card.domElement.addEventListener('click', () => openCard(count));
-        boardDomElement.append(card.domElement);
+    board.setBoardSize();
+
+    for (let count = 1; count <= board.cardsCount; count++) {
+        let cardContent = count <= board.cardPairsCount ? singleCardUnits[count - 1] : singleCardUnits[Math.abs(count - board.cardsCount)],
+            card = new Card(count, cardContent);
+        card.createDOMElement(board.boardWidth / board.colums, board.boardHeight / board.rows, count);
+        card.addCardContent(cardContent);
+        card.domElement.onclick = () => openCard(count);
+        board.boardElementRef.append(card.domElement);
         allCards.push(card);
-        initialCardsCollection.push({...card});
     }
+    initialCardsCollection = [...allCards];
     anime({
         targets: '#main-board .card-element__back',
         scale: [
@@ -59,80 +54,64 @@ window.onload = () => {
 }
 
 /**
- * Create a DOM element for card with certain attributes
- * @param width
- * @param height
- * @param id
- * @returns {HTMLDivElement}
- */
-function createCard(width, height, id, cardTextNode) {
-    const card = document.createElement('div'),
-        textNodeElem = document.createElement('p');
-    card.className = 'card-element__back';
-    card.id = id;
-    card.style.width = `${width}px`;
-    card.style.height = `${height}px`;
-    card.style.visibility = 'visible';
-    textNodeElem.classList.add('card-value');
-    textNodeElem.appendChild(document.createTextNode(cardTextNode));
-    card.appendChild(textNodeElem);
-    return card;
-}
-
-/**
  * Count time spent for quiz
  * @param duration
  * @param displayElement
  */
 function startTimer(duration, displayElement) {
+    gameResult = document.createElement('div');
+    gameResult.className = 'result-container';
+    gameMainSection.appendChild(gameResult);
+
     let timer = duration,
         minutes, seconds;
+    clearInterval(timeCounterId);
     timeCounterId = setInterval(function () {
         minutes = parseInt(timer / 60, 10)
         seconds = parseInt(timer % 60, 10);
-
         minutes = minutes < 10 ? "0" + minutes : minutes;
         seconds = seconds < 10 ? "0" + seconds : seconds;
-
         displayElement.textContent = minutes + ":" + seconds;
-        timeLeft = timer;
 
-        if (--timer === 0) {
-            alert(!!allCards.length ? 'You lost!' : 'You won!');
-            return;
+        --timer;
+        if (timer < 0 && !!allCards.length) {
+            gameResult.appendChild(document.createTextNode('Oopps..! You lost, game is over!'));
         }
-        if (!allCards.length) {
+        if (timer > 0 && !allCards.length) {
+            gameResult.appendChild(document.createTextNode('Congratulations, you won!'));
+        }
+        if (!!gameResult.childNodes.length) {
+            board.boardElementRef.classList.add('board-low-opacity');
             clearInterval(timeCounterId);
-            alert('You won!');
         }
     }, 1000);
 }
 
 /**
- * On button click start game and countdown time
+ * Start game
  */
 function startGame() {
+    resetBoardVisibility();
     let duration = board.timeLimit * 60;
     startTimer(duration, timerDisplay);
     gameStarted = true;
-}
-
-function replayGame() {
-    allCards = initialCardsCollection;
-    Array.from(boardDomElement.children).forEach(childNode => {
-        childNode.style.visibility = 'visible';
-        editStylesDynamically(childNode, 'card-element__back', 'card-element__top');
-    });
-    clearInterval(timeCounterId);
-    startGame();
+    startButton.style.display = 'none';
+    replayButton.style.display = 'block';
 }
 
 /**
- * Stop game on mouse left outside the board
- * @param event
+ * Restart game
  */
-function stopGame() {
+function replayGame() {
+    resetBoardVisibility();
+    allCards = initialCardsCollection;
+    Array.from(board.boardElementRef.children).forEach(childNode => {
+        childNode.style.visibility = 'visible';
+        childNode.classList.add('card-element__back');
+        childNode.classList.remove('card-element__top');
+    });
     clearInterval(timeCounterId);
+    startGame();
 }
 
 /**
@@ -144,16 +123,14 @@ function openCard(id) {
         return;
     }
     let openedCard = allCards.find(card => card.id === id);
+    let openedCards = [];
     openedCard.opened = !openedCard.opened;
-    const cardsOpened = allCards.filter(card => card.opened);
+    openedCards = allCards.filter(card => card.opened);
 
-    if (cardsOpened.length > 2) return;
-    if (openedCard.opened) {
-        editStylesDynamically(openedCard.domElement, 'card-element__top', 'card-element__back');
-    } else {
-        editStylesDynamically(openedCard.domElement, 'card-element__back', 'card-element__top');
+    openedCard.editStylesDynamically(openedCard.opened ? ['card-element__top', 'card-element__back'] : ['card-element__back', 'card-element__top']);
+    if (openedCards.length === 2) {
+        checkIfOpenedCardsMatch(openedCards[0], openedCards[1]);
     }
-    checkIfOpenedCardsMatch(cardsOpened[0], cardsOpened[1]);
 }
 
 /**
@@ -162,21 +139,22 @@ function openCard(id) {
  * @param card2
  */
 function checkIfOpenedCardsMatch(card1, card2) {
-    let textContent, matchesShower = document.getElementById('cards-match-shower');
+    let textContent;
+    let matchesShower = document.getElementById('cards-match-shower');
     if (card1.cardValue !== card2.cardValue) {
         card1.opened = false;
         card2.opened = false;
         setTimeout(() => {
-            editStylesDynamically(card1.domElement, 'card-element__back', 'card-element__top');
-            editStylesDynamically(card2.domElement, 'card-element__back', 'card-element__top');
+            card1.editStylesDynamically(['card-element__back', 'card-element__top']);
+            card2.editStylesDynamically(['card-element__back', 'card-element__top']);
             textContent = '';
             matchesShower.textContent = textContent;
         }, 500);
     } else {
         allCards = allCards.filter(card => card.id !== card1.id && card.id !== card2.id);
         setTimeout(() => {
-            document.getElementById(card1.id).style.visibility = 'hidden';
-            document.getElementById(card2.id).style.visibility = 'hidden';
+            card1.hideCardContent();
+            card2.hideCardContent();
             textContent = `Cards width ids ${card1.id} and ${card2.id} matched`;
             matchesShower.textContent = textContent;
         }, 500);
@@ -220,13 +198,13 @@ function generateRandomString(length) {
 }
 
 /**
- * Remove/add css classes depending on card opened state
- * @param element
- * @param class1
- * @param class2
+ * Remove game result container when game is restarted/replayed
  */
-function editStylesDynamically(element, class1, class2) {
-    element.classList.add(class1);
-    element.classList.remove(class2);
+function resetBoardVisibility() {
+    if (gameMainSection.contains(gameResult)) {
+        board.boardElementRef.classList.remove('board-low-opacity');
+        gameMainSection.removeChild(gameResult);
+    }
 }
+
 

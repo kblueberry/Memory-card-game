@@ -13,13 +13,19 @@
 }
 
 .action {
-    width: 65px;
+    width: 70px;
+    height: 30px;
+    line-height: 22px;
     background: white;
     color: black;
     font-size: 16px;
     outline: none;
     border-radius: 4px;
     margin: 0 4px;
+}
+
+.replay {
+    display: none;
 }
 
 .timer {
@@ -39,6 +45,14 @@
     flex-direction: row;
     flex-wrap: wrap;
     margin: 0 auto;
+}
+
+.result-container {
+    position: absolute;
+    top: 50%;
+    width: inherit;
+    height: 60px;
+    font-size: 36px;
 }
 
 .card-element__back, .card-element__top {
@@ -64,4 +78,8 @@
 
 .card-element__top .card-value {
     display: block;
+}
+
+.board-low-opacity {
+    opacity: .4;
 }
