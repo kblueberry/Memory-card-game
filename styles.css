@@ -24,6 +24,10 @@
     margin: 0 4px;
 }
 
+.start {
+    opacity: 0;
+}
+
 .replay {
     display: none;
 }
@@ -62,7 +66,7 @@
 }
 
 .card-element__back {
-    background: forestgreen;
+    background-image: repeating-linear-gradient(#f5e642 10%, #de8b1f 15%);
 }
 
 .card-element__top {

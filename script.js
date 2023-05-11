@@ -43,14 +43,29 @@ window.onload = () => {
         allCards.push(card);
     }
     initialCardsCollection = [...allCards];
-    anime({
-        targets: '#main-board .card-element__back',
-        scale: [
-            {value: .1, easing: 'easeOutSine', duration: 400},
-            {value: 1, easing: 'easeInOutQuad', duration: 500}
-        ],
-        delay: anime.stagger(200, {grid: [6, 4], from: 'last'})
-    }, 400);
+
+    let gameAttributesTimeline = anime.timeline({
+        duration: 1200,
+        delay: 150
+    });
+    gameAttributesTimeline
+        .add(
+            {
+                targets: '#main-board .card-element__back',
+                scale: [
+                    {value: .1, easing: 'easeOutSine', duration: 400},
+                    {value: 1, easing: 'easeInOutQuad', duration: 500}
+                ],
+                delay: anime.stagger(200, {grid: [6, 4], from: 'last'})
+            }
+        )
+        .add(
+            {
+                targets: startButton,
+                opacity: ['.2', '.5', '1'],
+                easing: 'easeInQuint'
+            }
+        );
 }
 
 /**
@@ -97,6 +112,12 @@ function startGame() {
     gameStarted = true;
     startButton.style.display = 'none';
     replayButton.style.display = 'block';
+    anime({
+        targets: replayButton,
+        scale: [0, 1],
+        delay: 250,
+        duration: 800
+    });
 }
 
 /**
@@ -142,8 +163,6 @@ function checkIfOpenedCardsMatch(card1, card2) {
     let textContent;
     let matchesShower = document.getElementById('cards-match-shower');
     if (card1.cardValue !== card2.cardValue) {
-        card1.opened = false;
-        card2.opened = false;
         setTimeout(() => {
             card1.editStylesDynamically(['card-element__back', 'card-element__top']);
             card2.editStylesDynamically(['card-element__back', 'card-element__top']);
@@ -158,21 +177,25 @@ function checkIfOpenedCardsMatch(card1, card2) {
             textContent = `Cards width ids ${card1.id} and ${card2.id} matched`;
             matchesShower.textContent = textContent;
         }, 500);
-
-        let matchTextTimeline = anime.timeline({
+        
+        let cardsMatchShower = anime.timeline({
             targets: matchesShower,
             duration: 500,
-            easing: 'easeInOutSine',
+            easing: 'easeInOutCubic',
             direction: 'alternate'
         });
-        matchTextTimeline
+        cardsMatchShower
             .add({
-                translateX: '-300%'
+                scale: 1.5,
+                opacity: 0
             })
             .add({
-                translateX: '25%',
-            })
+                scale: 1,
+                opacity: ['.5', '1']
+            });
     }
+    card1.opened = false;
+    card2.opened = false;
     anime({
         targets: [card1.domElement, card2.domElement],
         opacity: ['.2', '.5', '.8', '1'],
@@ -198,7 +221,7 @@ function generateRandomString(length) {
 }
 
 /**
- * Remove game result container when game is restarted/replayed
+ * Remove game result layer when game is restarted/replayed
  */
 function resetBoardVisibility() {
     if (gameMainSection.contains(gameResult)) {
