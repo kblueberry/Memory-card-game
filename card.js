@@ -46,8 +46,8 @@ export default class Card {
      * @param class1
      * @param class2
      */
-    editStylesDynamically(class1, class2) {
-        this.domElement.classList.add(class1);
-        this.domElement.classList.remove(class2);
+    editStylesDynamically(classes) {
+        this.domElement.classList.add(classes[0]);
+        this.domElement.classList.remove(classes[1]);
     }
 }

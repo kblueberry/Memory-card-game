@@ -13,7 +13,8 @@ const singleCardUnits = [];
 let gameResult;
 let timeCounterId,
     timerDisplay = document.querySelector('.timer'),
-    replayButton = document.querySelector('.replay');
+    replayButton = document.querySelector('.replay'),
+    startButton = document.querySelector('.start');
 let allCards = [], initialCardsCollection = [];
 let gameStarted = false;
 let index = 1;
@@ -23,9 +24,8 @@ while (index <= board.cardPairsCount) {
     index++;
 }
 
-document.querySelector('.start').onclick = () => startGame();
+startButton.onclick = () => startGame();
 replayButton.onclick = () => replayGame();
-replayButton.style.display = 'none';
 
 /**
  * On window load generate cards
@@ -41,8 +41,8 @@ window.onload = () => {
         card.domElement.onclick = () => openCard(count);
         board.boardElementRef.append(card.domElement);
         allCards.push(card);
-        initialCardsCollection.push({...card});
     }
+    initialCardsCollection = [...allCards];
 }
 
 /**
@@ -53,7 +53,7 @@ window.onload = () => {
 function startTimer(duration, displayElement) {
     gameResult = document.createElement('div');
     gameResult.className = 'result-container';
-    document.querySelector('.main').appendChild(gameResult);
+    gameMainSection.appendChild(gameResult);
 
     let timer = duration,
         minutes, seconds;
@@ -87,6 +87,7 @@ function startGame() {
     let duration = board.timeLimit * 60;
     startTimer(duration, timerDisplay);
     gameStarted = true;
+    startButton.style.display = 'none';
     replayButton.style.display = 'block';
 }
 
@@ -114,16 +115,14 @@ function openCard(id) {
         return;
     }
     let openedCard = allCards.find(card => card.id === id);
+    let openedCards = [];
     openedCard.opened = !openedCard.opened;
-    const cardsOpened = allCards.filter(card => card.opened);
+    openedCards = allCards.filter(card => card.opened);
 
-    if (cardsOpened.length > 2) return;
-    if (openedCard.opened) {
-        openedCard.editStylesDynamically('card-element__top', 'card-element__back');
-    } else {
-        openedCard.editStylesDynamically('card-element__back', 'card-element__top');
+    openedCard.editStylesDynamically(openedCard.opened ? ['card-element__top', 'card-element__back'] : ['card-element__back', 'card-element__top']);
+    if (openedCards.length === 2) {
+        checkIfOpenedCardsMatch(openedCards[0], openedCards[1]);
     }
-    checkIfOpenedCardsMatch(cardsOpened[0], cardsOpened[1]);
 }
 
 /**
@@ -138,8 +137,8 @@ function checkIfOpenedCardsMatch(card1, card2) {
         card1.opened = false;
         card2.opened = false;
         setTimeout(() => {
-            card1.editStylesDynamically('card-element__back', 'card-element__top');
-            card2.editStylesDynamically('card-element__back', 'card-element__top');
+            card1.editStylesDynamically(['card-element__back', 'card-element__top']);
+            card2.editStylesDynamically(['card-element__back', 'card-element__top']);
             textContent = '';
             matchesShower.textContent = textContent;
         }, 500);
