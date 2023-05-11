@@ -97,6 +97,11 @@ function startGame() {
     gameStarted = true;
     startButton.style.display = 'none';
     replayButton.style.display = 'block';
+    // anime({
+    //     targets: replayButton,
+    //     display: 'block',
+    //     duration: 2000
+    // });
 }
 
 /**
@@ -142,8 +147,6 @@ function checkIfOpenedCardsMatch(card1, card2) {
     let textContent;
     let matchesShower = document.getElementById('cards-match-shower');
     if (card1.cardValue !== card2.cardValue) {
-        card1.opened = false;
-        card2.opened = false;
         setTimeout(() => {
             card1.editStylesDynamically(['card-element__back', 'card-element__top']);
             card2.editStylesDynamically(['card-element__back', 'card-element__top']);
@@ -159,20 +162,19 @@ function checkIfOpenedCardsMatch(card1, card2) {
             matchesShower.textContent = textContent;
         }, 500);
 
-        let matchTextTimeline = anime.timeline({
+        anime.timeline({
             targets: matchesShower,
             duration: 500,
             easing: 'easeInOutSine',
             direction: 'alternate'
+        }).add({
+            translateX: '-300%'
+        }).add({
+            translateX: '25%',
         });
-        matchTextTimeline
-            .add({
-                translateX: '-300%'
-            })
-            .add({
-                translateX: '25%',
-            })
     }
+    card1.opened = false;
+    card2.opened = false;
     anime({
         targets: [card1.domElement, card2.domElement],
         opacity: ['.2', '.5', '.8', '1'],
