@@ -51,6 +51,14 @@ window.onload = () => {
         ],
         delay: anime.stagger(200, {grid: [6, 4], from: 'last'})
     }, 400);
+
+    anime({
+        targets: startButton,
+        opacity: ['.2', '.5', '1'],
+        easing: 'easeInQuint',
+        delay: 300,
+        duration: 1300
+    });
 }
 
 /**
