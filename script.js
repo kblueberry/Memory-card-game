@@ -43,7 +43,7 @@ window.onload = () => {
         allCards.push(card);
     }
     initialCardsCollection = [...allCards];
-    
+
     let gameAttributesTimeline = anime.timeline({
         duration: 1200,
         delay: 150
@@ -182,17 +182,22 @@ function checkIfOpenedCardsMatch(card1, card2) {
             textContent = `Cards width ids ${card1.id} and ${card2.id} matched`;
             matchesShower.textContent = textContent;
         }, 500);
-
-        anime.timeline({
+        
+        let cardsMatchShower = anime.timeline({
             targets: matchesShower,
             duration: 500,
-            easing: 'easeInOutSine',
+            easing: 'easeInOutCubic',
             direction: 'alternate'
-        }).add({
-            translateX: '-300%'
-        }).add({
-            translateX: '25%',
         });
+        cardsMatchShower
+            .add({
+                scale: 1.5,
+                opacity: 0
+            })
+            .add({
+                scale: 1,
+                opacity: ['.5', '1']
+            });
     }
     card1.opened = false;
     card2.opened = false;
