@@ -226,7 +226,7 @@ function generateRandomString(length) {
 }
 
 /**
- * Remove game result container when game is restarted/replayed
+ * Remove game result layer when game is restarted/replayed
  */
 function resetBoardVisibility() {
     if (gameMainSection.contains(gameResult)) {
