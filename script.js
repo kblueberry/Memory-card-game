@@ -111,11 +111,6 @@ function startGame() {
     startTimer(duration, timerDisplay);
     gameStarted = true;
     startButton.style.display = 'none';
-    anime({
-        targets: replayButton,
-        scale: 0,
-        duration: 800
-    });
     replayButton.style.display = 'block';
     anime({
         targets: replayButton,
