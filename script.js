@@ -43,22 +43,29 @@ window.onload = () => {
         allCards.push(card);
     }
     initialCardsCollection = [...allCards];
-    anime({
-        targets: '#main-board .card-element__back',
-        scale: [
-            {value: .1, easing: 'easeOutSine', duration: 400},
-            {value: 1, easing: 'easeInOutQuad', duration: 500}
-        ],
-        delay: anime.stagger(200, {grid: [6, 4], from: 'last'})
-    }, 400);
-
-    anime({
-        targets: startButton,
-        opacity: ['.2', '.5', '1'],
-        easing: 'easeInQuint',
-        delay: 300,
-        duration: 1300
+    
+    let gameAttributesTimeline = anime.timeline({
+        duration: 1200,
+        delay: 150
     });
+    gameAttributesTimeline
+        .add(
+            {
+                targets: '#main-board .card-element__back',
+                scale: [
+                    {value: .1, easing: 'easeOutSine', duration: 400},
+                    {value: 1, easing: 'easeInOutQuad', duration: 500}
+                ],
+                delay: anime.stagger(200, {grid: [6, 4], from: 'last'})
+            }
+        )
+        .add(
+            {
+                targets: startButton,
+                opacity: ['.2', '.5', '1'],
+                easing: 'easeInQuint'
+            }
+        );
 }
 
 /**
